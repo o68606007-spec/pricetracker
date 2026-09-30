@@ -1,0 +1,36 @@
+version: '3'
+services:
+  web:
+    build:
+      context: ./pricetracker
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://user:pricetrackerpassword@db:5432/pricetracker
+    depends_on:
+      - db
+
+  backend:
+    build:
+      context: ./pricetrackerbackend
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    volumes:
+      - ./pricetrackerbackend:/app
+    depends_on:
+      - db
+
+  db:
+    image: postgres:16-alpine
+    container_name: postgres-db
+    environment:
+      POSTGRES_DB: pricetracker
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pricetrackerpassword
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
